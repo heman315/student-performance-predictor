@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Performance Predictor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial; background: #f4f4f4; padding: 40px; }
+        .box { width: 450px; margin: auto; background:white; padding:20px; border-radius:10px; }
+        input { width: 100%; padding: 10px; margin-top: 10px; }
+        button { width:100%; padding:10px; margin-top: 15px; background:#4CAF50; color:white; border: none; }
+        h2 { text-align:center; }
+        .result { margin-top:20px; padding:10px; border-radius:5px; text-align:center; }
+        .high { background:#d4edda; }      /* green */
+        .medium { background:#fff3cd; }    /* yellow */
+        .low { background:#f8d7da; }       /* red */
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Student Performance Predictor</h2>
+
+    <form method="POST" action="/predict">
+        <label>Hours Studied:</label>
+        <input type="number" step="0.1" name="hours" required>
+        
+        <label>Attendance (%):</label>
+        <input type="number" step="0.1" name="attendance" required>
+        
+        <label>Previous Marks:</label>
+        <input type="number" step="0.1" name="prevmarks" required>
+        
+        <label>Assignments Completed:</label>
+        <input type="number" step="1" name="assignments" required>
+        
+        <label>Sleep Hours:</label>
+        <input type="number" step="0.1" name="sleep" required>
+
+        <button type="submit">Predict Performance</button>
+    </form>
+
+    {% if result %}
+    <div class="result {% if result=='High' %}high{% elif result=='Medium' %}medium{% else %}low{% endif %}">
+        <h3>Predicted Performance: {{ result }}</h3>
+        <p>Confidence: {{ confidence }}%</p>
+    </div>
+
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Hours','Attendance','PrevMarks','Assignments','Sleep'],
+                datasets: [{
+                    label: 'Your Input',
+                    data: [{{ hours }}, {{ attendance }}, {{ prevmarks }}, {{ assignments }}, {{ sleep }}],
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+    {% endif %}
+
+    {% if error %}
+    <div class="result" style="background:#ffe7e7;">
+        <p><strong>{{ error }}</strong></p>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
